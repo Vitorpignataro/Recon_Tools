@@ -52,7 +52,7 @@ class startWorks(Thread):
 
 class ResultColors:
     OK = '\033[92m'
-    REDIRECT = ''
+    REDIRECT = '\033[34m'
     ERROR = '\033[91m'
     ServerError = '\033[93m'
     PATTERN = '\033[0m'
@@ -66,11 +66,18 @@ def ListaDiretorios(file):
             listaDeDiretorios.append(url)
     urls.close()
 
+
+
 def ExibeResultado(url, statuscode):
-    if statuscode >= 200 and statuscode < 300 and statuscode not in listaStatusCode:
+    if statuscode >= 200 and statuscode < 300 and str(statuscode) not in listaStatusCode:
         print(f'{url} <-> {ResultColors.OK}{statuscode}{ResultColors.PATTERN}\n')
-    # else:
-        # print(f'{url} <-> {ResultColors.Error}{statuscode}{ResultColors.RESET}\n')
+    elif statuscode >= 300 and statuscode < 399 and str(statuscode) not in listaStatusCode:
+        print(f'{url} <-> {ResultColors.REDIRECT}{statuscode}{ResultColors.PATTERN}\n')
+    elif statuscode >= 400 and statuscode < 499 and str(statuscode) not in listaStatusCode:
+        print(f'{url} <-> {ResultColors.ERROR}{statuscode}{ResultColors.PATTERN}\n')
+    elif statuscode >= 500 and statuscode < 599 and str(statuscode) not in listaStatusCode:
+        print(f'{url} <-> {ResultColors.ServerError}{statuscode}{ResultColors.PATTERN}\n')
+
 
 
 def FuzzingRequest(Diretorio, urlAttack):
