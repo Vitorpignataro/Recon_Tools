@@ -1,5 +1,6 @@
-from dataclasses import replace
-from msilib.schema import Directory
+# from dataclasses import replace
+# from distutils.log import ERROR
+# from msilib.schema import Directory
 from queue import Queue
 from threading import Thread
 from queue import Queue
@@ -7,12 +8,29 @@ import sys
 import requests
 
 
-# Variaveis Globais
-filePath = 'wordlist.txt'
+
+# Global vars
 listaDeDiretorios = []
-urlAttack = 'https://google.com.br/RECON'
+listaStatusCode = []
+urlAttack = sys.argv[1]
+filePath = sys.argv[2]
+
+if len(sys.argv) == 4:
+    hiddenStatusCode = sys.argv[3]
+    hiddenStatusCode = hiddenStatusCode.replace('hc', '')
+    hiddenStatusCode = hiddenStatusCode.replace(',', ' ')
+    listaStatusCode = (hiddenStatusCode.split())
+else:
+    hiddenStatusCode = ''
 
 
+
+#In case of run the script manually use hardcode input bellow
+
+'''
+filePath = 'wordlist.txt'
+urlAttack = 'https:/you_target_url/RECON'
+'''
 
 class startWorks(Thread):
     def __init__(self, queue):
@@ -32,18 +50,35 @@ class startWorks(Thread):
                 self.queue.task_done()
 
 
+class ResultColors:
+    OK = '\033[92m'
+    REDIRECT = ''
+    ERROR = '\033[91m'
+    ServerError = '\033[93m'
+    PATTERN = '\033[0m'
+
+
+
 def ListaDiretorios(file):
     with open(f'ReconFuzzingDirectory/{file}', 'r') as urls:
         for url in urls:
             url = url.rstrip('\n')
             listaDeDiretorios.append(url)
+    urls.close()
+
+def ExibeResultado(url, statuscode):
+    if statuscode >= 200 and statuscode < 300 and statuscode not in listaStatusCode:
+        print(f'{url} <-> {ResultColors.OK}{statuscode}{ResultColors.PATTERN}\n')
+    # else:
+        # print(f'{url} <-> {ResultColors.Error}{statuscode}{ResultColors.RESET}\n')
 
 
 def FuzzingRequest(Diretorio, urlAttack):
     urlAttack = urlAttack.replace('RECON', Diretorio)
     response = requests.get(urlAttack)
-    if(response.status_code == 200):
-        return print(f'{urlAttack} {response.status_code}')
+    ExibeResultado(urlAttack, response.status_code)
+    # if(response.status_code == 200):
+    #     return print(f'{urlAttack} {response.status_code}')
 
 
 def main():
@@ -56,13 +91,9 @@ def main():
         worker.start()
 
     for fuzzlist in listaDeDiretorios:
-
         queue.put(fuzzlist)
 
     queue.join()
-
-
-
 
 
 
