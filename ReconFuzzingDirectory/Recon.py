@@ -1,12 +1,9 @@
-# from dataclasses import replace
-# from distutils.log import ERROR
-# from msilib.schema import Directory
+#!/usr/bin/python -u
 from queue import Queue
 from threading import Thread
 from queue import Queue
 import sys
 import requests
-
 
 
 # Global vars
@@ -32,6 +29,8 @@ filePath = 'wordlist.txt'
 urlAttack = 'https:/you_target_url/RECON'
 '''
 
+
+#Class responsible for starting the thread system
 class startWorks(Thread):
     def __init__(self, queue):
         Thread.__init__(self)
@@ -50,6 +49,8 @@ class startWorks(Thread):
                 self.queue.task_done()
 
 
+
+#Color Palette for any types of status code response
 class ResultColors:
     OK = '\033[92m'
     REDIRECT = '\033[34m'
@@ -58,7 +59,7 @@ class ResultColors:
     PATTERN = '\033[0m'
 
 
-
+#Extract all words from user wordlist
 def ListaDiretorios(file):
     with open(f'ReconFuzzingDirectory/{file}', 'r') as urls:
         for url in urls:
@@ -67,25 +68,23 @@ def ListaDiretorios(file):
     urls.close()
 
 
-
+#Print result based on status code response
 def ExibeResultado(url, statuscode):
     if statuscode >= 200 and statuscode < 300 and str(statuscode) not in listaStatusCode:
-        print(f'{url} <-> {ResultColors.OK}{statuscode}{ResultColors.PATTERN}\n')
+        print(f'{url} <-> {ResultColors.OK}{statuscode}{ResultColors.PATTERN}\n', flush=True)
     elif statuscode >= 300 and statuscode < 399 and str(statuscode) not in listaStatusCode:
-        print(f'{url} <-> {ResultColors.REDIRECT}{statuscode}{ResultColors.PATTERN}\n')
+        print(f'{url} <-> {ResultColors.REDIRECT}{statuscode}{ResultColors.PATTERN}\n', flush=True)
     elif statuscode >= 400 and statuscode < 499 and str(statuscode) not in listaStatusCode:
-        print(f'{url} <-> {ResultColors.ERROR}{statuscode}{ResultColors.PATTERN}\n')
+        print(f'{url} <-> {ResultColors.ERROR}{statuscode}{ResultColors.PATTERN}\n', flush=True)
     elif statuscode >= 500 and statuscode < 599 and str(statuscode) not in listaStatusCode:
-        print(f'{url} <-> {ResultColors.ServerError}{statuscode}{ResultColors.PATTERN}\n')
+        print(f'{url} <-> {ResultColors.ServerError}{statuscode}{ResultColors.PATTERN}\n', flush=True)
 
 
-
+#Make requests through the words extracted from the wordlist
 def FuzzingRequest(Diretorio, urlAttack):
     urlAttack = urlAttack.replace('RECON', Diretorio)
     response = requests.get(urlAttack)
     ExibeResultado(urlAttack, response.status_code)
-    # if(response.status_code == 200):
-    #     return print(f'{urlAttack} {response.status_code}')
 
 
 def main():
@@ -101,6 +100,7 @@ def main():
         queue.put(fuzzlist)
 
     queue.join()
+
 
 
 
