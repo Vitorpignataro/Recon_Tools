@@ -1,9 +1,11 @@
-#!/usr/bin/python -u
-from queue import Queue
+
 from threading import Thread
 from queue import Queue
+from time import  time
 import sys
+from unittest import result
 import requests
+
 
 
 # Global vars
@@ -57,6 +59,7 @@ class ResultColors:
     ERROR = '\033[91m'
     ServerError = '\033[93m'
     PATTERN = '\033[0m'
+    BOLD = '\033[1m'
 
 
 #Extract all words from user wordlist
@@ -80,14 +83,18 @@ def ExibeResultado(url, statuscode):
         print(f'{url} <-> {ResultColors.ServerError}{statuscode}{ResultColors.PATTERN}\n', flush=True)
 
 
-#Make requests through the words extracted from the wordlist
+#Make requests through the words extracted from the user file
 def FuzzingRequest(Diretorio, urlAttack):
     urlAttack = urlAttack.replace('RECON', Diretorio)
-    response = requests.get(urlAttack)
-    ExibeResultado(urlAttack, response.status_code)
+    try:
+        response = requests.get(urlAttack)
+        ExibeResultado(urlAttack, response.status_code)
+    except requests.exceptions.ConnectionError:
+        print(f'{urlAttack} <-> Connection refused\n') 
 
 
 def main():
+    timeStart = time()
     queue = Queue()
     ListaDiretorios(filePath)
 
@@ -100,8 +107,8 @@ def main():
         queue.put(fuzzlist)
 
     queue.join()
-
-
+    timePassed = time()
+    print(f'Execution time: {ResultColors.BOLD}{timePassed - timeStart}')
 
 
 if __name__ == '__main__':
