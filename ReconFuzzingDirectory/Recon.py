@@ -1,26 +1,35 @@
-
 from threading import Thread
 from queue import Queue
 from time import  time
+from tabulate import tabulate
 import sys
 from unittest import result
 import requests
+import re
+
 
 
 
 # Global vars
 listaDeDiretorios = []
 listaStatusCode = []
+listaChars = []
 urlAttack = sys.argv[1]
 filePath = sys.argv[2]
+hiddenStatusCode = ''
+hiddenChars = ''
 
 if len(sys.argv) == 4:
     hiddenStatusCode = sys.argv[3]
-    hiddenStatusCode = hiddenStatusCode.replace('hc', '')
-    hiddenStatusCode = hiddenStatusCode.replace(',', ' ')
-    listaStatusCode = (hiddenStatusCode.split())
-else:
-    hiddenStatusCode = ''
+elif len(sys.argv) == 5:
+    hiddenStatusCode = sys.argv[3]
+    hiddenChars = sys.argv[4]
+
+hiddenChars = re.sub('[^0-9]', ' ', hiddenChars)
+hiddenStatusCode = re.sub('[^0-9]', ' ', hiddenStatusCode)
+listaStatusCode = (hiddenStatusCode.split())
+listaChars = (hiddenChars.split())
+
 
 
 
@@ -72,14 +81,14 @@ def ListaDiretorios(file):
 
 
 #Print result based on status code response
-def ExibeResultado(url, statuscode):
-    if statuscode >= 200 and statuscode < 300 and str(statuscode) not in listaStatusCode:
-        print(f'{url} <-> {ResultColors.OK}{statuscode}{ResultColors.PATTERN}\n', flush=True)
-    elif statuscode >= 300 and statuscode < 399 and str(statuscode) not in listaStatusCode:
+def ExibeResultado(url, statuscode, charset):
+    if statuscode >= 200 and statuscode < 300 and str(statuscode) not in listaStatusCode and str(charset) not in listaChars:
+        print(f'{url} <-> {ResultColors.OK}{statuscode}{ResultColors.PATTERN} Chars: {charset}\n', flush=True)
+    elif statuscode >= 300 and statuscode < 399 and str(statuscode) not in listaStatusCode and str(charset) not in listaChars:
         print(f'{url} <-> {ResultColors.REDIRECT}{statuscode}{ResultColors.PATTERN}\n', flush=True)
-    elif statuscode >= 400 and statuscode < 499 and str(statuscode) not in listaStatusCode:
+    elif statuscode >= 400 and statuscode < 499 and str(statuscode) not in listaStatusCode and str(charset) not in listaChars:
         print(f'{url} <-> {ResultColors.ERROR}{statuscode}{ResultColors.PATTERN}\n', flush=True)
-    elif statuscode >= 500 and statuscode < 599 and str(statuscode) not in listaStatusCode:
+    elif statuscode >= 500 and statuscode < 599 and str(statuscode) not in listaStatusCode and str(charset) not in listaChars:
         print(f'{url} <-> {ResultColors.ServerError}{statuscode}{ResultColors.PATTERN}\n', flush=True)
 
 
@@ -88,7 +97,7 @@ def FuzzingRequest(Diretorio, urlAttack):
     urlAttack = urlAttack.replace('RECON', Diretorio)
     try:
         response = requests.get(urlAttack)
-        ExibeResultado(urlAttack, response.status_code)
+        ExibeResultado(urlAttack, response.status_code, len(response.text))
     except requests.exceptions.ConnectionError:
         print(f'{urlAttack} <-> Connection refused\n') 
 
@@ -114,4 +123,3 @@ def main():
 if __name__ == '__main__':
     main()
     
-
