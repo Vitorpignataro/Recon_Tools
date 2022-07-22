@@ -85,11 +85,11 @@ def ExibeResultado(url, statuscode, charset):
     if statuscode >= 200 and statuscode < 300 and str(statuscode) not in listaStatusCode and str(charset) not in listaChars:
         print(f'{url} <-> {ResultColors.OK}{statuscode}{ResultColors.PATTERN} Chars: {charset}\n', flush=True)
     elif statuscode >= 300 and statuscode < 399 and str(statuscode) not in listaStatusCode and str(charset) not in listaChars:
-        print(f'{url} <-> {ResultColors.REDIRECT}{statuscode}{ResultColors.PATTERN}\n', flush=True)
+        print(f'{url} <-> {ResultColors.REDIRECT}{statuscode}{ResultColors.PATTERN} Chars: {charset}\n', flush=True)
     elif statuscode >= 400 and statuscode < 499 and str(statuscode) not in listaStatusCode and str(charset) not in listaChars:
-        print(f'{url} <-> {ResultColors.ERROR}{statuscode}{ResultColors.PATTERN}\n', flush=True)
+        print(f'{url} <-> {ResultColors.ERROR}{statuscode}{ResultColors.PATTERN} Chars: {charset}\n', flush=True)
     elif statuscode >= 500 and statuscode < 599 and str(statuscode) not in listaStatusCode and str(charset) not in listaChars:
-        print(f'{url} <-> {ResultColors.ServerError}{statuscode}{ResultColors.PATTERN}\n', flush=True)
+        print(f'{url} <-> {ResultColors.ServerError}{statuscode}{ResultColors.PATTERN} Chars: {charset}\n', flush=True)
 
 
 #Make requests through the words extracted from the user file
