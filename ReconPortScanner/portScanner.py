@@ -7,8 +7,17 @@ import socket
 banner = pyfiglet.figlet_format('PORT SCANNER')
 print(banner)
 
+'''
+Arg =  -P1 top portas
+ARG =  -P2 Todas as portas
+'''
+
 target = sys.argv[1]
-print(target) 
+
+if sys.argv[2].find("1"):
+    portRange = 1000
+else:
+    portRange = 66666
 
 socket.gethostbyname(target)
 
@@ -52,7 +61,7 @@ def main():
         worker.daemon = True
         worker.start()
     
-    for port in range(1, 444):
+    for port in range(1, portRange):
         queue.put(port)
 
     queue.join()
