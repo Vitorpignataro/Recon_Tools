@@ -1,14 +1,14 @@
 from threading import Thread
 from queue import Queue
 from time import  time
-from tabulate import tabulate
 import sys
 from unittest import result
 import requests
 import re
+import pyfiglet
 
-
-
+banner = pyfiglet.figlet_format('Discovery All the things')
+print(banner)
 
 # Global vars
 listaDeDiretorios = []
